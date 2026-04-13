@@ -55,6 +55,9 @@ let autoplayMediaObserver = null;
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 const easeOutCubic = (value) => 1 - (1 - value) ** 3;
 const normalizeText = (value = "") => value.replace(/\s+/g, " ").trim();
+const hasLoadedMediaFrame = (media) =>
+  media instanceof HTMLMediaElement &&
+  (media.readyState >= HTMLMediaElement.HAVE_METADATA || Boolean(media.currentSrc));
 
 const getPublicPageUrl = () => {
   if (!/^https?:$/i.test(window.location.protocol)) {
@@ -162,6 +165,7 @@ const buildStructuredData = () => {
       "description": metaDescription?.getAttribute("content") || "",
       "image": [primaryImageUrl, heroImageUrl].filter(Boolean),
       "telephone": contactPhoneLink?.getAttribute("href")?.replace(/^tel:/i, "") || "",
+      "email": footerBusiness.dataset.email || undefined,
       "priceRange": footerBusiness.dataset.priceRange || undefined,
       "address": {
         "@type": "PostalAddress",
@@ -677,15 +681,33 @@ const syncAutoplayMediaItem = (media) => {
 
   if (!shouldPlay) {
     media.pause();
-    frame?.classList.remove("is-video-ready");
+
+    if (hasLoadedMediaFrame(media)) {
+      frame?.classList.add("is-video-ready");
+    } else {
+      frame?.classList.remove("is-video-ready");
+    }
+
     return;
+  }
+
+  if (media.networkState === HTMLMediaElement.NETWORK_EMPTY) {
+    media.load();
+  }
+
+  if (hasLoadedMediaFrame(media)) {
+    frame?.classList.add("is-video-ready");
   }
 
   const playAttempt = media.play();
 
   if (typeof playAttempt?.catch === "function") {
     playAttempt.catch(() => {
-      frame?.classList.remove("is-video-ready");
+      if (hasLoadedMediaFrame(media)) {
+        frame?.classList.add("is-video-ready");
+      } else {
+        frame?.classList.remove("is-video-ready");
+      }
     });
   }
 };
@@ -709,12 +731,16 @@ const setupAutoplayMedia = () => {
     const revealVideo = () => frame?.classList.add("is-video-ready");
     const hideVideo = () => frame?.classList.remove("is-video-ready");
 
+    media.addEventListener("loadedmetadata", revealVideo);
     media.addEventListener("loadeddata", revealVideo);
     media.addEventListener("canplay", revealVideo);
+    media.addEventListener("playing", revealVideo);
     media.addEventListener("error", hideVideo);
 
-    if (media.readyState >= 2) {
+    if (media.readyState >= HTMLMediaElement.HAVE_METADATA) {
       revealVideo();
+    } else if (media.networkState === HTMLMediaElement.NETWORK_EMPTY) {
+      media.load();
     }
   });
 
