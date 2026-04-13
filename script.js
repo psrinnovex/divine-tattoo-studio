@@ -59,6 +59,7 @@ const hasLoadedMediaFrame = (media) =>
   media instanceof HTMLMediaElement &&
   (media.readyState >= HTMLMediaElement.HAVE_METADATA || Boolean(media.currentSrc));
 const allowsAdvancedMotion = () => supportsHover.matches && !prefersReducedMotion.matches;
+const prefersTapToPlayMedia = () => !supportsHover.matches;
 const getAutoplayMediaFrame = (media) => media.closest(".trust-media");
 const getAutoplayMediaControl = (media) =>
   getAutoplayMediaFrame(media)?.querySelector("[data-video-control]");
@@ -715,6 +716,11 @@ const syncAutoplayMediaItem = (media) => {
     frame?.classList.add("is-video-ready");
   }
 
+  if (prefersTapToPlayMedia()) {
+    setManualVideoState(media, media.paused && hasLoadedMediaFrame(media));
+    return;
+  }
+
   const playAttempt = media.play();
 
   if (typeof playAttempt?.then === "function") {
@@ -758,7 +764,13 @@ const setupAutoplayMedia = () => {
 
     const frame = getAutoplayMediaFrame(media);
     const control = getAutoplayMediaControl(media);
-    const revealVideo = () => frame?.classList.add("is-video-ready");
+    const revealVideo = () => {
+      frame?.classList.add("is-video-ready");
+
+      if (prefersTapToPlayMedia() && media.paused) {
+        setManualVideoState(media, true);
+      }
+    };
     const hideVideo = () => {
       frame?.classList.remove("is-video-ready");
       setManualVideoState(media, false);
