@@ -1655,7 +1655,7 @@ body.instagram-modal-open {
   }
 
   .trust-media {
-    height: clamp(24rem, 96vw, 30rem);
+    height: clamp(30rem, 118vw, 40rem);
   }
 
   .studio-secondary {
@@ -1710,6 +1710,14 @@ body.instagram-modal-open {
   .artist-actions {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .trust-media {
+    height: clamp(32rem, 138vw, 42rem);
+  }
+
+  .trust-video-control {
+    inset: auto auto 0.85rem 0.85rem;
   }
 
   .artist-card-featured .artist-media {
