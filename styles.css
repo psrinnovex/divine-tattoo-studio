@@ -1076,8 +1076,8 @@ body.instagram-modal-open {
 }
 
 .artist-card-featured {
-  grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
-  align-items: center;
+  grid-template-columns: minmax(17rem, 21rem) minmax(0, 1fr);
+  align-items: stretch;
   max-width: 72rem;
   margin-inline: auto;
   background:
@@ -1093,13 +1093,14 @@ body.instagram-modal-open {
 }
 
 .artist-card-featured .artist-media {
-  align-self: stretch;
-  aspect-ratio: 4 / 5;
-  min-height: clamp(24rem, 42vw, 38rem);
+  width: 100%;
+  align-self: start;
+  aspect-ratio: 3 / 4;
+  min-height: 0;
 }
 
 .artist-card-featured .artist-media img {
-  object-position: center 18%;
+  object-position: center top;
 }
 
 .artist-copy {
@@ -1109,7 +1110,7 @@ body.instagram-modal-open {
 }
 
 .artist-card-featured .artist-copy {
-  align-content: center;
+  align-content: start;
   gap: 1rem;
   padding: clamp(1.5rem, 2.3vw, 2.35rem);
 }
@@ -1552,6 +1553,14 @@ body.instagram-modal-open {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .artist-card-featured {
+    grid-template-columns: minmax(16rem, 19rem) minmax(0, 1fr);
+  }
+
+  .artist-card-featured .artist-copy {
+    padding: 1.35rem;
+  }
+
   .hero-content {
     grid-template-columns: minmax(0, 1fr);
     gap: 1.5rem;
@@ -1721,13 +1730,18 @@ body.instagram-modal-open {
   }
 
   .artist-card-featured .artist-media {
-    aspect-ratio: 4 / 5;
-    min-height: clamp(18rem, 92vw, 26rem);
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    min-height: 0;
   }
 
   .artist-card-featured .artist-copy {
     gap: 0.85rem;
     padding: 1.1rem;
+  }
+
+  .artist-card-featured .artist-media img {
+    object-position: center top;
   }
 
   .artist-spotlight-meta,
