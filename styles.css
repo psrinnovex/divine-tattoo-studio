@@ -1046,10 +1046,14 @@ body.instagram-modal-open {
 }
 
 .portfolio-item:nth-child(8) {
-  grid-column: span 8;
+  grid-column: span 4;
 }
 
 .portfolio-item:nth-child(9) {
+  grid-column: span 8;
+}
+
+.portfolio-item:nth-child(10) {
   grid-column: span 4;
   min-height: 34rem;
 }
@@ -1535,12 +1539,13 @@ body.instagram-modal-open {
   .portfolio-item:nth-child(1),
   .portfolio-item:nth-child(4),
   .portfolio-item:nth-child(5),
-  .portfolio-item:nth-child(8) {
+  .portfolio-item:nth-child(8),
+  .portfolio-item:nth-child(9) {
     grid-column: auto;
     min-height: 22rem;
   }
 
-  .portfolio-item:nth-child(9) {
+  .portfolio-item:nth-child(10) {
     min-height: 28rem;
   }
 
@@ -1655,11 +1660,12 @@ body.instagram-modal-open {
   .portfolio-item:nth-child(1),
   .portfolio-item:nth-child(4),
   .portfolio-item:nth-child(5),
-  .portfolio-item:nth-child(8) {
+  .portfolio-item:nth-child(8),
+  .portfolio-item:nth-child(9) {
     min-height: 19rem;
   }
 
-  .portfolio-item:nth-child(9) {
+  .portfolio-item:nth-child(10) {
     min-height: 24rem;
   }
 
