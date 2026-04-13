@@ -1248,12 +1248,32 @@ body.instagram-modal-open {
     filter 320ms ease;
 }
 
+.trust-video-control {
+  position: absolute;
+  inset: auto auto 1rem 1rem;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, 0.6rem, 0);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.trust-video-control[hidden] {
+  display: none;
+}
+
 .trust-media.is-video-ready .trust-media-fallback {
   opacity: 0;
 }
 
 .trust-media.is-video-ready .trust-video {
   opacity: 1;
+}
+
+.trust-media.is-video-manual .trust-video-control {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0);
 }
 
 .trust-copy {

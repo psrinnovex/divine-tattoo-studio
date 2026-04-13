@@ -59,6 +59,19 @@ const hasLoadedMediaFrame = (media) =>
   media instanceof HTMLMediaElement &&
   (media.readyState >= HTMLMediaElement.HAVE_METADATA || Boolean(media.currentSrc));
 const allowsAdvancedMotion = () => supportsHover.matches && !prefersReducedMotion.matches;
+const getAutoplayMediaFrame = (media) => media.closest(".trust-media");
+const getAutoplayMediaControl = (media) =>
+  getAutoplayMediaFrame(media)?.querySelector("[data-video-control]");
+const setManualVideoState = (media, isVisible) => {
+  const frame = getAutoplayMediaFrame(media);
+  const control = getAutoplayMediaControl(media);
+
+  frame?.classList.toggle("is-video-manual", isVisible);
+
+  if (control instanceof HTMLButtonElement) {
+    control.hidden = !isVisible;
+  }
+};
 
 const getPublicPageUrl = () => {
   if (!/^https?:$/i.test(window.location.protocol)) {
@@ -673,7 +686,7 @@ const setupCounters = () => {
 };
 
 const syncAutoplayMediaItem = (media) => {
-  const frame = media.closest(".trust-media");
+  const frame = getAutoplayMediaFrame(media);
 
   if (!(media instanceof HTMLMediaElement)) {
     return;
@@ -683,6 +696,7 @@ const syncAutoplayMediaItem = (media) => {
 
   if (!shouldPlay) {
     media.pause();
+    setManualVideoState(media, false);
 
     if (hasLoadedMediaFrame(media)) {
       frame?.classList.add("is-video-ready");
@@ -703,14 +717,24 @@ const syncAutoplayMediaItem = (media) => {
 
   const playAttempt = media.play();
 
-  if (typeof playAttempt?.catch === "function") {
-    playAttempt.catch(() => {
-      if (hasLoadedMediaFrame(media)) {
-        frame?.classList.add("is-video-ready");
-      } else {
-        frame?.classList.remove("is-video-ready");
-      }
-    });
+  if (typeof playAttempt?.then === "function") {
+    playAttempt
+      .then(() => {
+        setManualVideoState(media, false);
+      })
+      .catch(() => {
+        setManualVideoState(media, true);
+
+        if (hasLoadedMediaFrame(media)) {
+          frame?.classList.add("is-video-ready");
+        } else {
+          frame?.classList.remove("is-video-ready");
+        }
+      });
+  } else if (media.paused) {
+    setManualVideoState(media, true);
+  } else {
+    setManualVideoState(media, false);
   }
 };
 
@@ -732,15 +756,41 @@ const setupAutoplayMedia = () => {
     media.setAttribute("playsinline", "");
     media.setAttribute("webkit-playsinline", "");
 
-    const frame = media.closest(".trust-media");
+    const frame = getAutoplayMediaFrame(media);
+    const control = getAutoplayMediaControl(media);
     const revealVideo = () => frame?.classList.add("is-video-ready");
-    const hideVideo = () => frame?.classList.remove("is-video-ready");
+    const hideVideo = () => {
+      frame?.classList.remove("is-video-ready");
+      setManualVideoState(media, false);
+    };
 
     media.addEventListener("loadedmetadata", revealVideo);
     media.addEventListener("loadeddata", revealVideo);
     media.addEventListener("canplay", revealVideo);
-    media.addEventListener("playing", revealVideo);
+    media.addEventListener("playing", () => {
+      revealVideo();
+      setManualVideoState(media, false);
+    });
     media.addEventListener("error", hideVideo);
+
+    if (control instanceof HTMLButtonElement) {
+      control.hidden = true;
+      control.addEventListener("click", () => {
+        setManualVideoState(media, false);
+
+        if (media.networkState === HTMLMediaElement.NETWORK_EMPTY) {
+          media.load();
+        }
+
+        const playAttempt = media.play();
+
+        if (typeof playAttempt?.catch === "function") {
+          playAttempt.catch(() => {
+            setManualVideoState(media, true);
+          });
+        }
+      });
+    }
 
     if (media.readyState >= HTMLMediaElement.HAVE_METADATA) {
       revealVideo();
