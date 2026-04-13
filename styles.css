@@ -1236,11 +1236,6 @@ body.menu-open .mobile-menu {
 }
 
 @media (max-width: 56rem) {
-  .site-header {
-    position: fixed;
-    inset: 0 0 auto;
-  }
-
   .nav-links {
     display: none;
   }
