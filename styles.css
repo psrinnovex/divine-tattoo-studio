@@ -1152,22 +1152,6 @@ body.menu-open .mobile-menu {
   color: var(--text);
 }
 
-.mobile-booking-cta {
-  position: fixed;
-  right: 1rem;
-  bottom: 1rem;
-  left: 1rem;
-  z-index: 35;
-  display: none;
-  justify-content: center;
-  padding: 0.95rem 1rem;
-  border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-  color: #fff;
-  font-weight: 800;
-  box-shadow: 0 18px 35px rgba(215, 90, 102, 0.28);
-}
-
 .reveal {
   --reveal-y: 2rem;
   --reveal-scale: 0.985;
@@ -1252,6 +1236,11 @@ body.menu-open .mobile-menu {
 }
 
 @media (max-width: 56rem) {
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto;
+  }
+
   .nav-links {
     display: none;
   }
@@ -1318,13 +1307,6 @@ body.menu-open .mobile-menu {
     width: 100%;
   }
 
-  .mobile-booking-cta {
-    display: inline-flex;
-  }
-
-  .site-footer {
-    padding-bottom: 8rem;
-  }
 }
 
 @media (max-width: 40rem) {
