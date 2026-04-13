@@ -58,6 +58,7 @@ const normalizeText = (value = "") => value.replace(/\s+/g, " ").trim();
 const hasLoadedMediaFrame = (media) =>
   media instanceof HTMLMediaElement &&
   (media.readyState >= HTMLMediaElement.HAVE_METADATA || Boolean(media.currentSrc));
+const allowsAdvancedMotion = () => supportsHover.matches && !prefersReducedMotion.matches;
 
 const getPublicPageUrl = () => {
   if (!/^https?:$/i.test(window.location.protocol)) {
@@ -548,7 +549,8 @@ const updateScrollMotion = () => {
   header?.classList.toggle("is-scrolled", scrollY > 24);
   updateActiveSection();
 
-  if (prefersReducedMotion.matches) {
+  if (!allowsAdvancedMotion()) {
+    resetMotionState();
     return;
   }
 
@@ -600,7 +602,7 @@ const requestScrollUpdate = () => {
 };
 
 const setupReveals = () => {
-  if (prefersReducedMotion.matches) {
+  if (!allowsAdvancedMotion()) {
     revealItems.forEach((item) => item.classList.add("is-visible"));
     return;
   }
@@ -726,6 +728,9 @@ const setupAutoplayMedia = () => {
     media.muted = true;
     media.defaultMuted = true;
     media.playsInline = true;
+    media.setAttribute("muted", "");
+    media.setAttribute("playsinline", "");
+    media.setAttribute("webkit-playsinline", "");
 
     const frame = media.closest(".trust-media");
     const revealVideo = () => frame?.classList.add("is-video-ready");
@@ -747,7 +752,7 @@ const setupAutoplayMedia = () => {
   autoplayMediaObserver?.disconnect();
   autoplayMediaObserver = null;
 
-  if ("IntersectionObserver" in window) {
+  if ("IntersectionObserver" in window && supportsHover.matches) {
     autoplayMediaObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
